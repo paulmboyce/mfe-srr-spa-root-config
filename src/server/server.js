@@ -6,6 +6,8 @@ import http from "http";
 import fetch from "node-fetch";
 import { servicesConfig } from "./microfrontend.services.config.js";
 
+const developmentMode = process.env.NODE_ENV === "development";
+
 const serverLayout = constructServerLayout({
   filePath: "src/server/views/index.html",
 });
@@ -22,9 +24,9 @@ const getSystemJsImportMapScript = async () => {
   )}</script>`;
   return script;
 };
-const port = 9000;
+const port = process.env.PORT || 9000;
 // eslint-disable-next-line no-console
-console.log(`Server started on port ${port}...`);
+console.log(`Server starting on port ${port}...`);
 http
   .createServer((req, res) => {
     const fetchPromises = {};
