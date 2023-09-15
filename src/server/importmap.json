@@ -1,0 +1,13 @@
+{
+  "imports": {
+    "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+    "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
+    "@isomorphic-mf/navbar": "https://storage.googleapis.com/isomorphic.microfrontends.app/navbar/179aaa63f3f220b6d0c4675865d16d3b4ddd8995/isomorphic-mf-navbar.js",
+    "@isomorphic-mf/navbar/": "https://storage.googleapis.com/isomorphic.microfrontends.app/navbar/179aaa63f3f220b6d0c4675865d16d3b4ddd8995/",
+    "@isomorphic-mf/root-config": "https://storage.googleapis.com/isomorphic.microfrontends.app/root-config/016db7599625c5e00526f64850e0c845201d0f81/isomorphic-mf-root-config.js",
+    "@isomorphic-mf/root-config/": "https://storage.googleapis.com/isomorphic.microfrontends.app/root-config/016db7599625c5e00526f64850e0c845201d0f81/",
+    "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.5.3/lib/system/single-spa.min.js",
+    "@isomorphic-mf/pokemons": "https://storage.googleapis.com/isomorphic.microfrontends.app/pokemons/8bd859cb4ca90b34f577c701aeaa1dcdada3a164/isomorphic-mf-pokemons.js",
+    "@isomorphic-mf/pokemons/": "https://storage.googleapis.com/isomorphic.microfrontends.app/pokemons/8bd859cb4ca90b34f577c701aeaa1dcdada3a164/"
+  }
+}

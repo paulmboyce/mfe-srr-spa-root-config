@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Isomorphic Microfrontends</title>
+  <meta name="importmap-type" content="systemjs-importmap" server-cookie server-only />
+  <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@2.0.0/dist/import-map-overrides.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.6.1/dist/system.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.6.1/dist/extras/amd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.6.1/dist/extras/named-exports.min.js"></script>
+</head>
+
+<body>
+  <template id="single-spa-layout">
+    <single-spa-router>
+      <route default>
+        <application name="@pmat-org/app1" props="user"></application>
+        <application name="@pmat-org/app1pink" props="user"></application>
+      </route>
+      <route path="/app1">
+        <application name="@pmat-org/app1" props="user"></application>
+      </route>
+    </single-spa-router>
+  </template>
+
+  <!-- 
+    The <assets> element is used to specify the location 
+    of server-rendered application assets, including CSS and fonts
+    SEE: https://single-spa.js.org/docs/layout-definition#assets 
+  -->
+  <assets></assets>
+
+  <fragment name="importmap"></fragment>
+
+
+
+  <script>
+    System.import('@pmat-org/root-config');
+  </script>
+  <import-map-overrides-full show-when-local-storage="devtools" dev-libs></import-map-overrides-full>
+</body>
+
+</html>
