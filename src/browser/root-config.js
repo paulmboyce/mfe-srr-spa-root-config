@@ -25,6 +25,18 @@ const applications = constructApplications({
   routes,
   loadApp({ name }) {
     return System.import(name).catch((b) => {
+      /* 
+        Add error handling
+        ================== 
+        because SystemJS 
+        crashes the whole app if one of our apps fails to load.  
+        (Clearly bad for UX.)
+        This solution is imperfect and can be improved.
+        Return a [stubAppFailedToLoad] object with expected 
+        api (bootstrap/mount/unmount) to prevent immediate crash.
+      */
+
+      // eslint-disable-next-line no-console
       console.log(`ERROR: (could not load) app ${name}`);
       return stubAppFailedToLoad;
     });
