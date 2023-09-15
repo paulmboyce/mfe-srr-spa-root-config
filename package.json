@@ -1,14 +1,19 @@
 {
   "name": "@pmat-org/root-config",
+  "type": "module",
   "scripts": {
-    "start": "webpack serve --port 9000 --env isLocal",
+    "start:dev": "NODE_ENV='development' concurrently npm:start:dev:*",
+    "start:dev:pack": "webpack serve --port 9002 --env isLocal=true --config webpack.config.cjs",
+    "start:dev:server": "PORT=9001 nodemon src/server/server.js",
+    "build:prod": "webpack --mode=production --config webpack.config.cjs",
+    "upload:prod": "./infra/uploadS3.sh",
+    "deploy:prod": "npm run build:prod && npm run upload:prod",
+    "start:prod:server": "NODE_ENV='production' PORT=9001 node src/server/server.js",
     "lint": "eslint src --ext js",
     "test": "cross-env BABEL_ENV=test jest --passWithNoTests",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "prepare": "husky install",
-    "build": "concurrently npm:build:*",
-    "build:webpack": "webpack --mode=production"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -26,6 +31,7 @@
     "husky": "^7.0.2",
     "jest": "^27.0.6",
     "jest-cli": "^27.0.6",
+    "nodemon": "^3.0.1",
     "prettier": "^2.3.2",
     "pretty-quick": "^3.1.1",
     "serve": "^12.0.0",
@@ -36,9 +42,15 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@node-loader/core": "^2.0.0",
+    "@node-loader/http": "^2.0.0",
+    "@node-loader/import-maps": "^1.1.0",
     "@types/jest": "^27.0.1",
     "@types/systemjs": "^6.1.1",
-    "single-spa": "^5.9.3",
-    "single-spa-layout": "^1.6.0"
+    "axios": "^1.5.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "single-spa": "^5.9.5",
+    "single-spa-layout": "^2.2.0",
+    "single-spa-web-server-utils": "^2.3.1"
   }
 }
