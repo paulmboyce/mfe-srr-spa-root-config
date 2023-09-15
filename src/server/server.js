@@ -1,16 +1,101 @@
 // NOTE: This serves a basic HTTP server for our SSR single-spa setup.
 // IMPORTANT: root-config/dist/pmat-org-root-config.js is not exposed.
 // For PROD our root-config/dist/pmat-org-root-config.js would be deployed to S3.
-
 import {
   constructServerLayout,
   sendLayoutHTTPResponse,
 } from "single-spa-layout/server";
 import http from "http";
 import fetch from "node-fetch";
-import { servicesConfig } from "./microfrontend.services.config.js";
+import axios from "axios";
 
 const developmentMode = process.env.NODE_ENV === "development";
+
+let CACHED_CONFIG = {};
+
+let servicesConfigDEV = {
+  importmap: {
+    imports: {
+      "react-dom":
+        "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
+      react:
+        "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+      "single-spa":
+        "https://cdn.jsdelivr.net/npm/single-spa@5.5.3/lib/system/single-spa.min.js",
+      /*   
+      styled-components,react-is
+      ==========================
+      Move styled-components (+ dependency react-is) to webpack externals[]
+        and add here to root-config import-map.
+        Avoids webpack dev server issues and makes app bundles smaller.
+        SRC: https://cdn.jsdelivr.net/npm/styled-components@5.3.11/dist/
+        SRC: https://cdn.jsdelivr.net/npm/react-is@18.2.0/umd/
+      */
+      "react-is":
+        "https://cdn.jsdelivr.net/npm/react-is@18.2.0/umd/react-is.production.min.js",
+      "styled-components":
+        "https://cdn.jsdelivr.net/npm/styled-components@5.3.11/dist/styled-components.min.js",
+      // From webpack dev server:
+      // "@pmat-org/app1": "http://localhost:3010/pmat-org-app1.js",
+      // "@pmat-org/app1pink": "http://localhost:4010/pmat-org-app1pink.js",
+      // From webpack /dist:
+      "@pmat-org/app1": "http://localhost:3011/pmat-org-app1.js",
+      "@pmat-org/app1pink": "http://localhost:4011/pmat-org-app1pink.js",
+      // "@pmat-org/app1red": "http://localhost:3002/pmat-org-app1red.js",
+      // "@pmat-org/root-config": "http://localhost:9002/pmat-org-root-config.js",
+      "@pmat-org/root-config":
+        "https://eu-west-1-ssr.s3.eu-west-1.amazonaws.com/pmat-org-root-config.js",
+    },
+  },
+  "server-side-render": {
+    "@pmat-org/app1": {
+      url: "localhost:3011/ssr",
+    },
+    "@pmat-org/app1pink": {
+      url: "localhost:4011/ssr",
+    },
+    "@pmat-org/app1red": {
+      url: "localhost:3001/ssr",
+    },
+  },
+};
+
+let servicesConfig = {};
+let lastFetched = 0;
+
+async function getServicesConfig() {
+  if (process.env.NODE_ENV === "production") {
+    return getServicesConfigWithCache();
+  } else {
+    console.log("Using DEV Services Config...");
+    return Promise.resolve(servicesConfigDEV);
+  }
+}
+
+async function getServicesConfigWithCache() {
+  if (Date.now() > lastFetched + 30000) {
+    const config = await getServicesConfigPROD();
+    lastFetched = Date.now();
+    console.log("Using LIVE CONFIG from AWS S3...");
+    return Promise.resolve(config);
+  } else {
+    console.log("Using CACHED CONFIG...");
+    return Promise.resolve(CACHED_CONFIG);
+  }
+}
+
+async function getServicesConfigPROD() {
+  console.log("PRODUCTION MODE, getting servicesConfig from AWS S3...");
+  try {
+    const response = await axios.get(
+      "https://eu-west-1-ssr.s3.eu-west-1.amazonaws.com/microfrontend.services.config.json"
+    );
+    CACHED_CONFIG = response.data;
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 const serverLayout = constructServerLayout({
   filePath: "src/server/views/index.html",
@@ -21,6 +106,7 @@ const injectFragment = async () => {
 };
 
 const getSystemJsImportMapScript = async () => {
+  const servicesConfig = await getServicesConfig();
   const script = `<script type="systemjs-importmap">${JSON.stringify(
     servicesConfig["importmap"],
     null,
@@ -29,8 +115,6 @@ const getSystemJsImportMapScript = async () => {
   return script;
 };
 const port = process.env.PORT || 9000;
-// eslint-disable-next-line no-console
-console.log(`Server starting on port ${port}...`);
 http
   .createServer((req, res) => {
     const fetchPromises = {};
@@ -92,7 +176,12 @@ http
   })
   .listen(port);
 
+// eslint-disable-next-line no-console
+console.log(`Server started on port ${port}`);
+
 async function fetchMicrofrontendStream(props) {
+  const servicesConfig = await getServicesConfig();
+
   const serviceEndpoint = servicesConfig["server-side-render"][props.name].url;
 
   // r.body is a Readable stream when you use node-fetch,
