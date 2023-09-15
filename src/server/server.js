@@ -1,3 +1,7 @@
+// NOTE: This serves a basic HTTP server for our SSR single-spa setup.
+// IMPORTANT: root-config/dist/pmat-org-root-config.js is not exposed.
+// For PROD our root-config/dist/pmat-org-root-config.js would be deployed to S3.
+
 import {
   constructServerLayout,
   sendLayoutHTTPResponse,
