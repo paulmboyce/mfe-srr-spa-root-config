@@ -1,4 +1,12 @@
 {
   "extends": ["important-stuff", "plugin:prettier/recommended"],
-  "parser": "@babel/eslint-parser"
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false
+  },
+  "rules": {
+    "node/no-missing-import": "off",
+    "node/no-unsupported-features/es-syntax": "off",
+    "node/no-extraneous-import": "off"
+  }
 }
